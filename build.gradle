@@ -1,0 +1,61 @@
+plugins {
+//    id 'java'
+//    id 'org.springframework.boot' version '2.5.0'
+    id "io.spring.dependency-management" version "1.0.8.RELEASE"
+}
+
+subprojects {
+    apply plugin: 'java'
+//    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java-library'
+
+    group = 'com.example'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        google()
+        maven { url 'https://repo.spring.io/milestone' }
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.5.0")
+        }
+    }
+}
+
+task copyJars(type: Copy) {
+    from('api-microservice/build/libs/api-microservice-0.0.1-SNAPSHOT.jar')
+    from('orders-microservice/build/libs/orders-microservice-0.0.1-SNAPSHOT.jar')
+    from('users-microservice/build/libs/users-microservice-0.0.1-SNAPSHOT.jar')
+    into('build/libs/')
+}
+
+//task assembleMonorepo(type: Zip) {
+//    dependsOn('api-microservice:build', 'orders-microservice:build', 'users-microservice:build')
+//    archiveFileName = 'monorepo.jar'
+//    destinationDirectory = file('build/libs/')
+//    from('api-microservice/build/libs/api-microservice-0.0.1-SNAPSHOT.jar')
+//    from('orders-microservice/build/libs/orders-microservice-0.0.1-SNAPSHOT.jar')
+//    from('users-microservice/build/libs/users-microservice-0.0.1-SNAPSHOT.jar')
+//}
+
+task assembleMonorepo(type: Jar) {
+    dependsOn copyJars
+    archiveFileName = 'monorepo.jar'
+    destinationDirectory = file('build/libs')
+    manifest {
+        attributes 'Main-Class': ''
+    }
+    from('build/libs/api-microservice-0.0.1-SNAPSHOT.jar')
+    from('build/libs/orders-microservice-0.0.1-SNAPSHOT.jar')
+    from('build/libs/users-microservice-0.0.1-SNAPSHOT.jar')
+}

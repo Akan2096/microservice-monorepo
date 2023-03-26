@@ -1,0 +1,25 @@
+version: '3'
+services:
+  api:
+    build: ./api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - users
+      - orders
+  users:
+    build: ./users
+    depends_on:
+      - db
+  orders:
+    build: ./orders
+    depends_on:
+      - db
+  db:
+    image: postgres:11
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
